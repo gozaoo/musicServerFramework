@@ -1,6 +1,10 @@
 export default {
     getMusicFiles,
-    editorMusicTag
+    editorMusicTag,
+    data: {
+      saveObject,
+      readObject
+    }
 }
 
 import {parseFile} from "music-metadata";
@@ -32,6 +36,7 @@ async function getMusicFiles(dir) {
         await parseFile(filePath).then(info => {
           musicFiles.push({
             path: filePath,
+            fileName: file,
             ...info
           });
         })
@@ -53,3 +58,31 @@ async function readMusicTag(path) {
         console.log(error);
     }
 }
+
+// 保存对象函数  
+async function saveObject(name, object) {  
+  // 检测 data 文件夹是否存在，如果不存在则创建  
+  const dataFolderPath = './data';  
+  if (!await fs.existsSync(dataFolderPath)) {  
+    await fs.mkdirSync(dataFolderPath);  
+  }
+  
+  // 在 data 文件夹写入一个文件名字为 name.json 的文件  
+  const filePath = path.join(dataFolderPath, `${name}.json`);  
+
+  // if (!await fs.existsSync(filePath)) {  
+  //   await fs.mkdirSync(filePath);  
+  // }
+
+  fs.writeFileSync(filePath, JSON.stringify(object));  
+ }
+ 
+ // 读取对象函数  
+ function readObject(name) {  
+  // 获取 data 文件夹下名字为 name.json 的文件  
+  const filePath = path.join('./data', `${name}.json`);
+  // 读取文件内容并转换成对象  
+  const object = JSON.parse(fs.readFileSync(filePath));
+  // 返回对象  
+  return object;  
+ }
